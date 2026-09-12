@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Study Planner & Focus Timer — Ofentse Chiloane</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --purple-deep:#3B32A0; --purple-mid:#534AB7; --purple-light:#7F77DD; --purple-tint:#EEEDFE;
+    --blue-deep:#0C447C; --blue-mid:#185FA5; --blue-light:#378ADD; --blue-tint:#E6F1FB;
+    --gray-text:#374151; --gray-muted:#6B7280; --border:#E8E7F8;
+    --font-display:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif;
+    --green:#1a9c6b; --red:#d1454a;
+  }
+  body{font-family:var(--font-body); color:var(--gray-text); background:#f8f8fc; line-height:1.6; padding-bottom:60px;}
+  .back{display:inline-flex; align-items:center; gap:6px; margin:24px 0 0 24px; font-size:14px; color:var(--purple-mid); font-weight:600; text-decoration:none;}
+  .wrap{max-width:920px; margin:0 auto; padding:20px 20px 0;}
+  header{text-align:center; margin:28px 0 30px;}
+  header .eyebrow{color:var(--purple-mid); font-weight:600; font-size:13px; letter-spacing:0.5px; text-transform:uppercase;}
+  header h1{font-family:var(--font-display); font-size:30px; margin-top:8px; color:#1f2430;}
+  header p{color:var(--gray-muted); font-size:14.5px; margin-top:8px;}
+
+  .grid{display:grid; grid-template-columns:1fr 1.2fr; gap:18px;}
+  .card{background:#fff; border:1px solid var(--border); border-radius:16px; padding:22px; box-shadow:0 4px 20px rgba(59,50,160,0.06);}
+  .card h3{font-family:var(--font-display); font-size:16px; margin-bottom:14px;}
+
+  /* Timer */
+  .timer-modes{display:flex; gap:8px; margin-bottom:20px;}
+  .mode{flex:1; text-align:center; padding:9px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer; color:var(--gray-muted); background:var(--purple-tint);}
+  .mode.active{background:var(--purple-mid); color:#fff;}
+  .clock{
+    font-family:var(--font-display); font-size:56px; font-weight:700; text-align:center;
+    color:var(--purple-deep); margin:10px 0 20px; letter-spacing:1px;
+  }
+  .timer-btns{display:flex; gap:10px;}
+  .timer-btns button{
+    flex:1; padding:12px; border:none; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer;
+    font-family:var(--font-body);
+  }
+  #startPause{background:var(--purple-mid); color:#fff;}
+  #startPause:hover{background:var(--purple-deep);}
+  #resetTimer{background:#fff; border:1.5px solid var(--border); color:var(--gray-text);}
+  .session-count{text-align:center; margin-top:16px; font-size:13px; color:var(--gray-muted);}
+  .session-count b{color:var(--purple-deep);}
+
+  /* Tasks */
+  .task-form{display:flex; gap:8px; margin-bottom:16px;}
+  .task-form input[type=text]{flex:1; padding:11px 13px; border:1.5px solid var(--border); border-radius:9px; font-size:13.5px; font-family:var(--font-body);}
+  .task-form select{padding:11px 10px; border:1.5px solid var(--border); border-radius:9px; font-size:13px; background:#fff;}
+  .task-form button{padding:11px 16px; border:none; border-radius:9px; background:var(--blue-mid); color:#fff; font-weight:600; cursor:pointer; font-size:13px;}
+
+  .task-list{max-height:340px; overflow-y:auto;}
+  .task{display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--border);}
+  .task input[type=checkbox]{width:18px; height:18px; accent-color:var(--purple-mid); flex-shrink:0;}
+  .task .name{flex:1; font-size:13.5px;}
+  .task.done .name{text-decoration:line-through; color:var(--gray-muted);}
+  .prio{font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:100px; text-transform:uppercase;}
+  .prio-high{background:#fde2e2; color:var(--red);}
+  .prio-medium{background:#fff3d6; color:#92610e;}
+  .prio-low{background:var(--blue-tint); color:var(--blue-deep);}
+  .task .del{background:none; border:none; color:var(--gray-muted); cursor:pointer; font-size:15px; padding:4px;}
+  .empty{color:var(--gray-muted); font-size:13px; text-align:center; padding:20px 0;}
+
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr;}
+    .clock{font-size:44px;}
+  }
+</style>
+</head>
+<body>
+
+<a class="back" href="../index.html#portfolio">← Back to portfolio</a>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Work sample</div>
+    <h1>Study Planner &amp; Focus Timer</h1>
+    <p>A Pomodoro-style focus timer paired with a prioritised task list — built for balancing WeThinkCode_ coursework with everything else.</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Focus timer</h3>
+      <div class="timer-modes">
+        <div class="mode active" data-mins="25">Focus 25</div>
+        <div class="mode" data-mins="5">Short break</div>
+        <div class="mode" data-mins="15">Long break</div>
+      </div>
+      <div class="clock" id="clock">25:00</div>
+      <div class="timer-btns">
+        <button id="startPause" onclick="toggleTimer()">Start</button>
+        <button id="resetTimer" onclick="resetTimer()">Reset</button>
+      </div>
+      <div class="session-count">Focus sessions completed today: <b id="sessionCount">0</b></div>
+    </div>
+
+    <div class="card">
+      <h3>Task list</h3>
+      <div class="task-form">
+        <input type="text" id="taskName" placeholder="e.g. Finish OOP assignment">
+        <select id="taskPrio">
+          <option value="high">High</option>
+          <option value="medium" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <button onclick="addTask()">Add</button>
+      </div>
+      <div class="task-list" id="taskList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Timer ----
+  let totalSeconds = 25*60;
+  let remaining = totalSeconds;
+  let ticking = null;
+  let currentMode = 25;
+
+  document.querySelectorAll('.mode').forEach(m=>{
+    m.addEventListener('click', ()=>{
+      document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));
+      m.classList.add('active');
+      currentMode = parseInt(m.dataset.mins);
+      resetTimer();
+    });
+  });
+
+  function formatTime(s){
+    const m = Math.floor(s/60).toString().padStart(2,'0');
+    const sec = (s%60).toString().padStart(2,'0');
+    return m+':'+sec;
+  }
+
+  function toggleTimer(){
+    const btn = document.getElementById('startPause');
+    if(ticking){
+      clearInterval(ticking);
+      ticking = null;
+      btn.textContent = 'Resume';
+    } else {
+      btn.textContent = 'Pause';
+      ticking = setInterval(()=>{
+        remaining--;
+        document.getElementById('clock').textContent = formatTime(Math.max(0,remaining));
+        if(remaining <= 0){
+          clearInterval(ticking); ticking = null;
+          btn.textContent = 'Start';
+          if(currentMode === 25){
+            const count = parseInt(localStorage.getItem('sp-sessions-today') || '0') + 1;
+            localStorage.setItem('sp-sessions-today', count);
+            document.getElementById('sessionCount').textContent = count;
+          }
+          resetTimer();
+        }
+      }, 1000);
+    }
+  }
+
+  function resetTimer(){
+    if(ticking){ clearInterval(ticking); ticking = null; }
+    remaining = currentMode*60;
+    document.getElementById('clock').textContent = formatTime(remaining);
+    document.getElementById('startPause').textContent = 'Start';
+  }
+
+  document.getElementById('sessionCount').textContent = localStorage.getItem('sp-sessions-today') || '0';
+
+  // ---- Tasks ----
+  const TASK_KEY = 'sp-tasks';
+  let tasks = JSON.parse(localStorage.getItem(TASK_KEY) || '[]');
+
+  function saveTasks(){ localStorage.setItem(TASK_KEY, JSON.stringify(tasks)); }
+
+  function addTask(){
+    const nameInput = document.getElementById('taskName');
+    const name = nameInput.value.trim();
+    const prio = document.getElementById('taskPrio').value;
+    if(!name) return;
+    tasks.push({ id: Date.now(), name, prio, done: false });
+    nameInput.value = '';
+    saveTasks(); renderTasks();
+  }
+
+  function toggleDone(id){
+    const t = tasks.find(t=>t.id===id);
+    t.done = !t.done;
+    saveTasks(); renderTasks();
+  }
+
+  function deleteTask(id){
+    tasks = tasks.filter(t=>t.id!==id);
+    saveTasks(); renderTasks();
+  }
+
+  function renderTasks(){
+    const order = {high:0, medium:1, low:2};
+    const sorted = [...tasks].sort((a,b)=> (a.done - b.done) || (order[a.prio]-order[b.prio]));
+    const list = document.getElementById('taskList');
+    if(sorted.length===0){
+      list.innerHTML = '<p class="empty">No tasks yet — add your first one above.</p>';
+      return;
+    }
+    list.innerHTML = sorted.map(t=>`
+      <div class="task ${t.done?'done':''}">
+        <input type="checkbox" ${t.done?'checked':''} onchange="toggleDone(${t.id})">
+        <span class="name">${t.name}</span>
+        <span class="prio prio-${t.prio}">${t.prio}</span>
+        <button class="del" onclick="deleteTask(${t.id})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  renderTasks();
+</script>
+</body>
+</html>

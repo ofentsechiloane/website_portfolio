@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Taxi Fare & Change Calculator — Ofentse Chiloane</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --purple-deep:#3B32A0; --purple-mid:#534AB7; --purple-light:#7F77DD; --purple-tint:#EEEDFE;
+    --blue-deep:#0C447C; --blue-mid:#185FA5; --blue-light:#378ADD; --blue-tint:#E6F1FB;
+    --gray-text:#374151; --gray-muted:#6B7280; --gray-light:#E5E7EB; --border:#E8E7F8;
+    --font-display:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif;
+  }
+  body{font-family:var(--font-body); color:var(--gray-text); background:#f8f8fc; line-height:1.6; padding-bottom:60px;}
+  .back{
+    display:inline-flex; align-items:center; gap:6px; margin:24px 0 0 24px; font-size:14px;
+    color:var(--purple-mid); font-weight:600; text-decoration:none;
+  }
+  .wrap{max-width:640px; margin:0 auto; padding:20px 20px 0;}
+  header{text-align:center; margin:28px 0 36px;}
+  header .eyebrow{color:var(--purple-mid); font-weight:600; font-size:13px; letter-spacing:0.5px; text-transform:uppercase;}
+  header h1{font-family:var(--font-display); font-size:30px; margin-top:8px; color:#1f2430;}
+  header p{color:var(--gray-muted); font-size:14.5px; margin-top:8px;}
+
+  .tabs{display:flex; gap:8px; background:#fff; border:1px solid var(--border); border-radius:12px; padding:6px; margin-bottom:22px;}
+  .tab{flex:1; text-align:center; padding:10px; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; color:var(--gray-muted);}
+  .tab.active{background:var(--purple-mid); color:#fff;}
+
+  .card{background:#fff; border:1px solid var(--border); border-radius:16px; padding:26px; box-shadow:0 4px 20px rgba(59,50,160,0.06);}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  label{display:block; font-size:13px; font-weight:600; color:var(--gray-text); margin-bottom:6px;}
+  input[type=number]{
+    width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px;
+    font-size:15px; font-family:var(--font-body); margin-bottom:18px; background:#fbfbfe;
+  }
+  input[type=number]:focus{outline:none; border-color:var(--purple-light);}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .btn{
+    width:100%; padding:13px; border:none; border-radius:10px; background:var(--purple-mid);
+    color:#fff; font-weight:600; font-size:14.5px; cursor:pointer; transition:background .2s;
+    font-family:var(--font-body);
+  }
+  .btn:hover{background:var(--purple-deep);}
+
+  .result{margin-top:22px; padding-top:20px; border-top:1px dashed var(--border);}
+  .result-row{display:flex; justify-content:space-between; padding:8px 0; font-size:14.5px;}
+  .result-row b{color:#1f2430;}
+  .result-hero{
+    background:var(--purple-tint); border-radius:12px; padding:18px; text-align:center; margin-bottom:16px;
+  }
+  .result-hero .num{font-family:var(--font-display); font-size:32px; font-weight:700; color:var(--purple-deep);}
+  .result-hero .lbl{font-size:12.5px; color:var(--gray-muted); margin-top:4px;}
+
+  .denoms{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
+  .denom{
+    background:var(--blue-tint); border-radius:10px; padding:12px 8px; text-align:center;
+  }
+  .denom .val{font-family:var(--font-display); font-weight:700; color:var(--blue-deep); font-size:15px;}
+  .denom .count{font-size:12px; color:var(--gray-muted); margin-top:3px;}
+  .warn{background:#fff4e5; color:#92400e; border-radius:10px; padding:12px 14px; font-size:13.5px; margin-top:14px;}
+  .empty{color:var(--gray-muted); font-size:13.5px; text-align:center; padding:20px 0;}
+</style>
+</head>
+<body>
+
+<a class="back" href="../index.html#portfolio">← Back to portfolio</a>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Work sample</div>
+    <h1>Taxi Fare &amp; Change Calculator</h1>
+    <p>Split a minibus taxi fare between passengers, or work out the exact note/coin change to hand back — in ZAR.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="split">Split fare</div>
+    <div class="tab" data-tab="change">Change calculator</div>
+  </div>
+
+  <div class="card">
+    <div class="panel active" id="split">
+      <label for="totalFare">Total fare (R)</label>
+      <input type="number" id="totalFare" placeholder="e.g. 180" min="0" step="0.5">
+      <label for="passengers">Number of passengers</label>
+      <input type="number" id="passengers" placeholder="e.g. 4" min="1" step="1">
+      <button class="btn" onclick="calcSplit()">Split the fare</button>
+      <div class="result" id="splitResult"></div>
+    </div>
+
+    <div class="panel" id="change">
+      <label for="cost">Fare owed (R)</label>
+      <input type="number" id="cost" placeholder="e.g. 45" min="0" step="0.5">
+      <label for="paid">Amount handed over (R)</label>
+      <input type="number" id="paid" placeholder="e.g. 50" min="0" step="0.5">
+      <button class="btn" onclick="calcChange()">Work out the change</button>
+      <div class="result" id="changeResult"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  function calcSplit(){
+    const fare = parseFloat(document.getElementById('totalFare').value);
+    const people = parseInt(document.getElementById('passengers').value);
+    const out = document.getElementById('splitResult');
+    if(!fare || !people || fare <= 0 || people <= 0){
+      out.innerHTML = '<p class="empty">Enter a fare and passenger count to split the bill.</p>';
+      return;
+    }
+    // Round each share up to the nearest 50c, since taxis rarely deal in smaller change
+    const rawShare = fare / people;
+    const roundedShare = Math.ceil(rawShare * 2) / 2;
+    const totalCollected = roundedShare * people;
+    const overage = totalCollected - fare;
+
+    out.innerHTML = `
+      <div class="result-hero">
+        <div class="num">R${roundedShare.toFixed(2)}</div>
+        <div class="lbl">per passenger (${people} people)</div>
+      </div>
+      <div class="result-row"><span>Total fare</span><b>R${fare.toFixed(2)}</b></div>
+      <div class="result-row"><span>Total collected</span><b>R${totalCollected.toFixed(2)}</b></div>
+      <div class="result-row"><span>${overage > 0 ? 'Extra collected (driver keeps / rounds down)' : 'Exact match'}</span><b>R${overage.toFixed(2)}</b></div>
+    `;
+  }
+
+  const DENOMS = [200,100,50,20,10,5,2,1,0.5,0.2,0.1];
+
+  function calcChange(){
+    const cost = parseFloat(document.getElementById('cost').value);
+    const paid = parseFloat(document.getElementById('paid').value);
+    const out = document.getElementById('changeResult');
+
+    if(isNaN(cost) || isNaN(paid) || cost < 0 || paid < 0){
+      out.innerHTML = '<p class="empty">Enter the fare owed and the amount handed over.</p>';
+      return;
+    }
+    if(paid < cost){
+      const short = cost - paid;
+      out.innerHTML = `<div class="warn">Short by R${short.toFixed(2)} — not enough was handed over.</div>`;
+      return;
+    }
+
+    let change = Math.round((paid - cost) * 100) / 100;
+    const breakdown = [];
+    for(const d of DENOMS){
+      const count = Math.floor((change + 1e-9) / d);
+      if(count > 0){
+        breakdown.push({d, count});
+        change = Math.round((change - count * d) * 100) / 100;
+      }
+    }
+
+    const totalChange = paid - cost;
+    let html = `
+      <div class="result-hero">
+        <div class="num">R${totalChange.toFixed(2)}</div>
+        <div class="lbl">change due</div>
+      </div>
+    `;
+
+    if(breakdown.length === 0){
+      html += '<p class="empty">No change needed — exact amount.</p>';
+    } else {
+      html += '<div class="denoms">' + breakdown.map(b => `
+        <div class="denom">
+          <div class="val">${b.d >= 1 ? 'R'+b.d : (b.d*100)+'c'}</div>
+          <div class="count">× ${b.count}</div>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    out.innerHTML = html;
+  }
+</script>
+</body>
+</html>
